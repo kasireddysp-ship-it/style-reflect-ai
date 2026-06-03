@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Section } from "@/components/Section";
 import { Splash } from "@/components/Splash";
-import { UploadCard } from "@/components/UploadCard";
+import { UploadCard, type PickedProfile } from "@/components/UploadCard";
 import { Analysis } from "@/components/Analysis";
 import { OccasionChat } from "@/components/OccasionChat";
 import { OutfitGallery, outfits } from "@/components/OutfitGallery";
@@ -174,7 +174,7 @@ function SustainableMode() {
 }
 
 function Index() {
-  const [demo, setDemo] = useState<string | null>(null);
+  const [demo, setDemo] = useState<PickedProfile | null>(null);
 
   return (
     <Phone>
@@ -232,13 +232,13 @@ function Index() {
           onClick={() => document.getElementById("analysis")?.scrollIntoView({ behavior: "smooth" })}
           className="pulse-glow mt-6 w-full rounded-full bg-gradient-primary py-4 text-sm font-medium text-primary-foreground shadow-glow transition active:scale-95"
         >
-          Analyze My Style {demo && `— ${demo}`}
+          Analyze My Style {demo && `— ${demo.name}`}
         </button>
       </Section>
 
       {/* 4. ANALYSIS */}
       <Section id="analysis" eyebrow="Step 02" title="AI is reading your style DNA." subtitle="50,000 fashion signals scanned in under 3 seconds.">
-        <Analysis />
+        <Analysis profile={demo} />
       </Section>
 
       {/* 5. OCCASION */}

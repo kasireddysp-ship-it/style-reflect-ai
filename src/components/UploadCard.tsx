@@ -1,14 +1,22 @@
 import { motion } from "framer-motion";
 import { useRef, useState } from "react";
 
-const demos = [
-  { name: "Wedding Guest", emoji: "💍", tag: "Festive · Ethnic" },
-  { name: "College Student", emoji: "🎓", tag: "Trendy · Casual" },
-  { name: "Young Professional", emoji: "💼", tag: "Smart · Modern" },
-  { name: "Corporate Executive", emoji: "👔", tag: "Power · Luxe" },
+export type PersonaKey = "wedding" | "college" | "professional" | "executive";
+
+export type PickedProfile = {
+  name: string;
+  persona: PersonaKey | "custom";
+  photo?: string; // object URL or undefined
+};
+
+const demos: { key: PersonaKey; name: string; emoji: string; tag: string }[] = [
+  { key: "wedding", name: "Wedding Guest", emoji: "💍", tag: "Festive · Ethnic" },
+  { key: "college", name: "College Student", emoji: "🎓", tag: "Trendy · Casual" },
+  { key: "professional", name: "Young Professional", emoji: "💼", tag: "Smart · Modern" },
+  { key: "executive", name: "Corporate Executive", emoji: "👔", tag: "Power · Luxe" },
 ];
 
-export function UploadCard({ onPicked }: { onPicked?: (name: string) => void }) {
+export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
   const [uploadType, setUploadType] = useState<"selfie" | "fullbody" | null>(null);
@@ -17,9 +25,10 @@ export function UploadCard({ onPicked }: { onPicked?: (name: string) => void }) 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const url = URL.createObjectURL(file);
     setUploadedFile(file.name);
     setPicked(null);
-    onPicked?.(`Photo: ${file.name}`);
+    onPicked?.({ name: `Your photo`, persona: "custom", photo: url });
   };
 
   const triggerUpload = (type: "selfie" | "fullbody") => {
@@ -78,7 +87,11 @@ export function UploadCard({ onPicked }: { onPicked?: (name: string) => void }) 
             <motion.button
               key={d.name}
               whileTap={{ scale: 0.96 }}
-              onClick={() => { setPicked(d.name); onPicked?.(d.name); }}
+              onClick={() => {
+                setPicked(d.name);
+                setUploadedFile(null);
+                onPicked?.({ name: d.name, persona: d.key });
+              }}
               className={`rounded-2xl p-4 text-left transition ${
                 picked === d.name
                   ? "bg-gradient-primary shadow-glow"
