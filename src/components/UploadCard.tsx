@@ -28,7 +28,7 @@ export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void
     const url = URL.createObjectURL(file);
     setUploadedFile(file.name);
     setPicked(null);
-    onPicked?.({ name: `Your photo`, persona: "custom", photo: url });
+    onPicked?.({ name: `Your photo`, persona: "custom", photo: `${url}#${Date.now()}` });
   };
 
   const triggerUpload = (type: "selfie" | "fullbody") => {
