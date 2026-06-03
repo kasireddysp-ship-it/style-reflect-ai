@@ -98,11 +98,13 @@ export function Analysis({ profile }: { profile?: PickedProfile | null }) {
   }, [profile?.name, profile?.persona, profile?.photo]);
 
   const data = useMemo<TraitSet>(() => {
-    if (profile?.photo) {
-      const base = profile.persona !== "custom" && profile.persona ? PERSONA_DATA[profile.persona] : DEFAULT_TRAITS;
-      return { ...base, photo: profile.photo };
+    if (profile?.persona && profile.persona !== "custom") {
+      const base = PERSONA_DATA[profile.persona];
+      return profile.photo ? { ...base, photo: profile.photo } : base;
     }
-    if (profile?.persona && profile.persona !== "custom") return PERSONA_DATA[profile.persona];
+    if (profile?.photo) {
+      return { photo: profile.photo, traits: generateTraits(profile.photo) };
+    }
     return DEFAULT_TRAITS;
   }, [profile]);
 
