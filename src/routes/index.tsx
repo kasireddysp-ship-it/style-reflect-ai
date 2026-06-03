@@ -45,9 +45,18 @@ function Phone({ children }: { children: React.ReactNode }) {
   );
 }
 
-function SquadVotes() {
+const FRIEND_REVIEWS = [
+  { name: "Ananya", emoji: "💁‍♀️", text: "The color really pops on you — go for it!" },
+  { name: "Rahul", emoji: "🧑‍🎤", text: "Fit looks sharp. Pair with brown loafers." },
+  { name: "Priya", emoji: "👩‍🎨", text: "Very mehandi-ready. Add gold jhumkas 😍" },
+  { name: "Kabir", emoji: "🧔", text: "Clean. Maybe try a darker dupatta though." },
+  { name: "Sneha", emoji: "👩‍💼", text: "Perfect — confident & elegant." },
+];
+
+function SquadVotes({ photo, outfitImage, outfitLabel }: { photo?: string; outfitImage?: string; outfitLabel?: string }) {
   const [votes, setVotes] = useState([7, 3, 1, 4]);
   const [voted, setVoted] = useState<number | null>(null);
+  const [pickedReviews, setPickedReviews] = useState<number[]>([]);
   const voteLabels = [["🔥", "Love"], ["👍", "Good"], ["🤔", "Try"], ["💯", "Perfect"]];
 
   const handleVote = (i: number) => {
@@ -55,29 +64,77 @@ function SquadVotes() {
     setVoted(i);
     setVotes((v) => v.map((c, j) => (j === i ? c + 1 : c)));
   };
+  const toggleReview = (i: number) =>
+    setPickedReviews((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
 
   const total = votes.reduce((a, b) => a + b, 0);
+  const heroImage = photo ?? outfitImage ?? trendy;
 
   return (
-    <div className="grid grid-cols-4 divide-x divide-white/5 text-center">
-      {voteLabels.map(([e, l], i) => (
-        <button
-          key={l}
-          onClick={() => handleVote(i)}
-          disabled={voted !== null}
-          className={`py-3 transition ${voted === i ? "bg-gradient-primary/20" : voted !== null ? "opacity-60" : "hover:bg-white/5 active:scale-95"}`}
-        >
-          <div className="text-xl">{e}</div>
-          <div className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
-          <div className="text-xs">{votes[i]}</div>
-        </button>
-      ))}
-      {voted !== null && (
-        <div className="col-span-4 border-t border-white/5 px-4 py-2 text-[10px] text-gold text-center">
-          Thanks! {Math.round((votes[voted] / (total)) * 100)}% of voters agree
+    <>
+      <div className="relative aspect-[4/3]">
+        <img src={heroImage} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
+        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+          <div className="rounded-full glass px-3 py-1.5 text-xs">
+            {photo ? "Your photo" : outfitLabel ?? "Pick an outfit"} · {total} votes
+          </div>
+          <div className="rounded-full bg-gradient-gold px-3 py-1.5 text-xs font-medium text-gold-foreground">
+            {Math.round((votes[0] / total) * 100)}% 🔥
+          </div>
         </div>
-      )}
-    </div>
+      </div>
+
+      <div className="grid grid-cols-4 divide-x divide-white/5 text-center">
+        {voteLabels.map(([e, l], i) => (
+          <button
+            key={l}
+            onClick={() => handleVote(i)}
+            disabled={voted !== null}
+            className={`py-3 transition ${voted === i ? "bg-gradient-primary/20" : voted !== null ? "opacity-60" : "hover:bg-white/5 active:scale-95"}`}
+          >
+            <div className="text-xl">{e}</div>
+            <div className="mt-0.5 text-[10px] uppercase tracking-wider text-muted-foreground">{l}</div>
+            <div className="text-xs">{votes[i]}</div>
+          </button>
+        ))}
+        {voted !== null && (
+          <div className="col-span-4 border-t border-white/5 px-4 py-2 text-[10px] text-gold text-center">
+            Thanks! {Math.round((votes[voted] / total) * 100)}% of voters agree
+          </div>
+        )}
+      </div>
+
+      <div className="border-t border-white/5 p-4">
+        <div className="mb-2 flex items-center justify-between">
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">Friend reviews · tap to like</div>
+          <div className="text-[10px] text-gold">{pickedReviews.length} liked</div>
+        </div>
+        <div className="space-y-2">
+          {FRIEND_REVIEWS.map((r, i) => {
+            const liked = pickedReviews.includes(i);
+            return (
+              <button
+                key={r.name}
+                onClick={() => toggleReview(i)}
+                className={`flex w-full items-start gap-3 rounded-2xl p-3 text-left transition active:scale-[0.99] ${
+                  liked ? "bg-gradient-primary/15 ring-1 ring-primary/40" : "glass hover:border-primary/30"
+                }`}
+              >
+                <span className="text-xl">{r.emoji}</span>
+                <div className="flex-1">
+                  <div className="text-xs font-medium">{r.name}</div>
+                  <div className="mt-0.5 text-[11px] text-muted-foreground">{r.text}</div>
+                </div>
+                <span className={`text-sm transition ${liked ? "text-gold scale-110" : "text-muted-foreground opacity-50"}`}>
+                  {liked ? "❤️" : "🤍"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -282,17 +339,9 @@ function Index() {
       {/* 9. SHARE & VOTES */}
       <Section eyebrow="Squad Approval" title="Borrow your friends' taste.">
         <Card className="!p-0 overflow-hidden">
-          <div className="relative aspect-[4/3]">
-            <img src={trendy} alt="" className="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-            <div className="absolute inset-0 bg-gradient-to-t from-background via-background/40 to-transparent" />
-            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-              <div className="rounded-full glass px-3 py-1.5 text-xs">12 friends voted</div>
-              <div className="rounded-full bg-gradient-gold px-3 py-1.5 text-xs font-medium text-gold-foreground">92% 🔥</div>
-            </div>
-          </div>
-          <SquadVotes />
+          <SquadVotes photo={demo?.photo} outfitImage={tryOnOutfit?.image} outfitLabel={tryOnOutfit?.label} />
           <div className="border-t border-white/5 p-4 text-xs text-muted-foreground">
-            <span className="text-gold">AI summary —</span> Most friends preferred Outfit B due to its stronger occasion match.
+            <span className="text-gold">AI summary —</span> Most friends preferred this look due to its strong occasion match.
           </div>
         </Card>
       </Section>
