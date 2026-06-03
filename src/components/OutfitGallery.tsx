@@ -143,16 +143,14 @@ export function OutfitGallery({ context, profile, onTryOn }: { context?: Occasio
         >
           <div className="relative aspect-[3/4] overflow-hidden">
             <img src={o.image} alt={o.label} className="h-full w-full object-cover" loading="lazy" />
-            {profile?.photo && (
-              <img src={profile.photo} alt="Your photo preview" className="absolute inset-0 h-full w-full object-cover opacity-30 mix-blend-luminosity" loading="lazy" />
-            )}
             <div className={`absolute inset-0 bg-gradient-to-t ${o.accent}`} />
             <div className="absolute left-3 top-3 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-wider">
               {o.label}
             </div>
             {profile?.photo && (
-              <div className="absolute left-3 top-11 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-wider text-gold">
-                On your photo
+              <div className="absolute left-3 top-11 flex items-center gap-2 rounded-full glass px-2 py-1 pr-3 text-[10px] uppercase tracking-wider text-gold">
+                <img src={profile.photo} alt="You" className="h-5 w-5 rounded-full object-cover ring-1 ring-gold/60" />
+                Picked for you
               </div>
             )}
             <div className="absolute right-3 top-3 rounded-full bg-gradient-gold px-3 py-1 text-[11px] font-medium text-gold-foreground">
