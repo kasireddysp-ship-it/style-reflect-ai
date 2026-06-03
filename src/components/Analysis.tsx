@@ -87,6 +87,10 @@ function generateTraits(seed: string) {
   });
 }
 
+function formatConfidence(seed: string, label: string) {
+  return 88 + (hashString(`${seed}:${label}:confidence`) % 10);
+}
+
 const stages = [
   "Detecting silhouette…",
   "Reading skin undertone…",
@@ -117,7 +121,7 @@ export function Analysis({ profile }: { profile?: PickedProfile | null }) {
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [profile?.name, profile?.persona, profile?.photo]);
+  }, [profile?.name, profile?.persona, profile?.photo, profile?.analysisSeed]);
 
   const data = useMemo<TraitSet>(() => {
     if (profile?.persona && profile.persona !== "custom") {
@@ -125,17 +129,30 @@ export function Analysis({ profile }: { profile?: PickedProfile | null }) {
       return profile.photo ? { ...base, photo: profile.photo } : base;
     }
     if (profile?.photo) {
-      return { photo: profile.photo, traits: generateTraits(profile.photo) };
+      return { photo: profile.photo, traits: generateTraits(profile.analysisSeed ?? profile.photo) };
     }
     return DEFAULT_TRAITS;
   }, [profile]);
+
+  const resultSeed = profile?.analysisSeed ?? profile?.photo ?? profile?.persona ?? "default";
 
   const stageIdx = Math.min(stages.length - 1, Math.floor((progress / 100) * stages.length));
 
   return (
     <div className="space-y-5">
       <div className="relative mx-auto aspect-[4/5] w-full max-w-sm overflow-hidden rounded-3xl glass-strong">
-        <img src={data.photo} alt="AI body scan" className="absolute inset-0 h-full w-full object-cover opacity-90" />
+        <AnimatePresence mode="wait">
+          <motion.img
+            key={data.photo}
+            src={data.photo}
+            alt="AI body scan"
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 0.9, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.35 }}
+            className="absolute inset-0 h-full w-full object-cover"
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/20 to-transparent" />
         {!done && (
           <div className="scanline absolute inset-x-0 h-24 bg-gradient-to-b from-transparent via-primary/40 to-transparent blur-md" />
@@ -182,6 +199,14 @@ export function Analysis({ profile }: { profile?: PickedProfile | null }) {
               >
                 <div className="text-[10px] uppercase tracking-[0.18em] text-muted-foreground">{t.label}</div>
                 <div className="mt-1 font-display text-lg">{t.value}</div>
+                <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-white/10">
+                  <motion.div
+                    className="h-full bg-gradient-to-r from-primary to-gold"
+                    initial={{ width: 0 }}
+                    animate={{ width: `${formatConfidence(resultSeed, t.label)}%` }}
+                    transition={{ delay: i * 0.08 + 0.15, duration: 0.45 }}
+                  />
+                </div>
               </motion.div>
             ))}
           </motion.div>
