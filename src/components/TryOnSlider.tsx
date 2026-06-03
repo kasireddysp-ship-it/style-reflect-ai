@@ -47,12 +47,19 @@ export function TryOnSlider({ profile, outfit }: { profile?: PickedProfile | nul
         onPointerMove={(e) => { if (e.buttons === 1) move(e.clientX); }}
         className="relative aspect-[3/4] w-full select-none overflow-hidden rounded-3xl glass-strong touch-none"
       >
-        <img src={beforePhoto} alt="Before" className="absolute inset-0 h-full w-full object-cover" />
+        {/* Right side: your original photo */}
+        <img src={beforePhoto} alt="Your photo" className="absolute inset-0 h-full w-full object-cover" />
+        {/* Left side: simulated try-on — your photo with outfit tinted on top */}
         <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pos}%` }}>
-          <img src={afterPhoto} alt="After" className="absolute inset-0 h-full w-full object-cover" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
-          {profile?.photo && (
-            <img src={beforePhoto} alt="Your photo blended with outfit" className="absolute inset-0 h-full w-full object-cover opacity-35 mix-blend-luminosity" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
-          )}
+          <img src={beforePhoto} alt="You wearing the outfit" className="absolute inset-0 h-full w-full object-cover" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
+          <img src={afterPhoto} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-soft-light" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
+          <div className="absolute bottom-16 left-3 right-3 flex items-center gap-2 rounded-2xl glass-strong p-2">
+            <img src={afterPhoto} alt={outfitName} className="h-12 w-10 rounded-lg object-cover" />
+            <div className="text-[11px] leading-tight">
+              <div className="text-gold">Now wearing</div>
+              <div className="font-medium">{outfitName}</div>
+            </div>
+          </div>
         </div>
         <div className="absolute inset-y-0" style={{ left: `${pos}%` }}>
           <div className="absolute inset-y-0 -ml-px w-0.5 bg-gradient-gold shadow-gold" />
@@ -60,13 +67,8 @@ export function TryOnSlider({ profile, outfit }: { profile?: PickedProfile | nul
             ⇆
           </div>
         </div>
-        <div className="absolute left-3 top-3 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-wider">Before</div>
-        <div className="absolute right-3 top-3 rounded-full bg-gradient-primary px-3 py-1 text-[10px] uppercase tracking-wider text-primary-foreground">{outfitName}</div>
-        {profile?.photo && (
-          <div className="absolute bottom-3 left-3 right-3 rounded-2xl glass px-3 py-2 text-xs">
-            ✨ Simulated on your uploaded photo
-          </div>
-        )}
+        <div className="absolute left-3 top-3 rounded-full bg-gradient-primary px-3 py-1 text-[10px] uppercase tracking-wider text-primary-foreground">On you</div>
+        <div className="absolute right-3 top-3 rounded-full glass px-3 py-1 text-[10px] uppercase tracking-wider">Original</div>
       </div>
       <div className="flex gap-3">
         <button
