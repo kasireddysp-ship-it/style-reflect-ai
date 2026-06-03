@@ -7,6 +7,8 @@ export type PickedProfile = {
   name: string;
   persona: PersonaKey | "custom";
   photo?: string; // object URL or undefined
+  analysisSeed?: string;
+  uploadMode?: "selfie" | "fullbody";
 };
 
 const demos: { key: PersonaKey; name: string; emoji: string; tag: string }[] = [
@@ -19,6 +21,7 @@ const demos: { key: PersonaKey; name: string; emoji: string; tag: string }[] = [
 export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void }) {
   const [picked, setPicked] = useState<string | null>(null);
   const [uploadedFile, setUploadedFile] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [uploadType, setUploadType] = useState<"selfie" | "fullbody" | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -26,9 +29,12 @@ export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void
     const file = e.target.files?.[0];
     if (!file) return;
     const url = URL.createObjectURL(file);
+    const seed = `${file.name}-${file.size}-${file.lastModified}-${Date.now()}`;
     setUploadedFile(file.name);
+    setPreviewUrl(url);
     setPicked(null);
-    onPicked?.({ name: `Your photo`, persona: "custom", photo: `${url}#${Date.now()}` });
+    onPicked?.({ name: uploadType === "selfie" ? "Your selfie" : "Your full body photo", persona: "custom", photo: url, analysisSeed: seed, uploadMode: uploadType ?? "fullbody" });
+    e.target.value = "";
   };
 
   const triggerUpload = (type: "selfie" | "fullbody") => {
@@ -49,8 +55,8 @@ export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void
       <div className="relative overflow-hidden rounded-3xl glass-strong p-8 text-center">
         <div className="absolute inset-0 bg-gradient-primary opacity-10" />
         <div className="relative mx-auto flex h-20 w-20 items-center justify-center rounded-full glass shadow-glow">
-          {uploadedFile ? (
-            <span className="text-3xl">✅</span>
+          {previewUrl ? (
+            <img src={previewUrl} alt="Uploaded preview" className="h-full w-full rounded-full object-cover" />
           ) : (
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M12 16V4M12 4l-4 4M12 4l4 4" />
@@ -90,7 +96,8 @@ export function UploadCard({ onPicked }: { onPicked?: (p: PickedProfile) => void
               onClick={() => {
                 setPicked(d.name);
                 setUploadedFile(null);
-                onPicked?.({ name: d.name, persona: d.key });
+                setPreviewUrl(null);
+                onPicked?.({ name: d.name, persona: d.key, analysisSeed: `${d.key}-${Date.now()}` });
               }}
               className={`rounded-2xl p-4 text-left transition ${
                 picked === d.name
