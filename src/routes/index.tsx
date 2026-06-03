@@ -4,8 +4,8 @@ import { Section } from "@/components/Section";
 import { Splash } from "@/components/Splash";
 import { UploadCard, type PickedProfile } from "@/components/UploadCard";
 import { Analysis } from "@/components/Analysis";
-import { OccasionChat } from "@/components/OccasionChat";
-import { OutfitGallery, outfits } from "@/components/OutfitGallery";
+import { OccasionChat, parseInput, type OccasionContext } from "@/components/OccasionChat";
+import { OutfitGallery, outfits, type Outfit } from "@/components/OutfitGallery";
 import { TryOnSlider } from "@/components/TryOnSlider";
 import accessories from "@/assets/accessories.jpg";
 import elegant from "@/assets/outfit-elegant.jpg";
@@ -175,6 +175,8 @@ function SustainableMode() {
 
 function Index() {
   const [demo, setDemo] = useState<PickedProfile | null>(null);
+  const [occasion, setOccasion] = useState<OccasionContext>(() => parseInput("I have a mehandi function next month dress under 2000"));
+  const [tryOnOutfit, setTryOnOutfit] = useState<Outfit | null>(null);
 
   return (
     <Phone>
@@ -243,12 +245,12 @@ function Index() {
 
       {/* 5. OCCASION */}
       <Section eyebrow="Step 03" title="Tell us about your event.">
-        <OccasionChat />
+        <OccasionChat onInterpreted={setOccasion} />
       </Section>
 
       {/* 6. OUTFIT GENERATION */}
       <Section id="outfits" eyebrow="Step 04" title="Three looks. One you." subtitle="Curated for your body, budget and moment.">
-        <OutfitGallery />
+        <OutfitGallery context={occasion} profile={demo} onTryOn={setTryOnOutfit} />
       </Section>
 
       {/* 7. WHY THIS SUITS YOU */}
@@ -274,7 +276,7 @@ function Index() {
 
       {/* 8. VIRTUAL TRY-ON */}
       <Section id="tryon" eyebrow="Virtual Try-On" title="Slide. Reveal. Believe." subtitle="Premium photoreal visualization on your own silhouette.">
-        <TryOnSlider />
+        <TryOnSlider profile={demo} outfit={tryOnOutfit} />
       </Section>
 
       {/* 9. SHARE & VOTES */}

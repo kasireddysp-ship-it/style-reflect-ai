@@ -2,13 +2,24 @@ import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
 const examples = [
-  "I have a haldi ceremony next month under ₹5000",
+  "I have a mehandi function next month dress under 2000",
   "I want a classy date-night look",
   "I need outfits for a Goa vacation",
   "I want a rich CEO vibe",
 ];
 
-type Tag = { k: string; v: string };
+export type Tag = { k: string; v: string };
+
+export type OccasionContext = {
+  raw: string;
+  tags: Tag[];
+  occasion: string;
+  budget: string;
+  formality: string;
+  styleIntent: string;
+  season: string;
+  eventType: string;
+};
 
 const OCCASIONS: { keys: string[]; label: string; formality: string; eventType: string }[] = [
   { keys: ["haldi"], label: "Haldi", formality: "Festive", eventType: "Day Function" },
@@ -98,13 +109,12 @@ function detectIntent(text: string) {
   return "Personalized";
 }
 
-function parseInput(text: string): Tag[] {
+export function parseInput(text: string): OccasionContext {
   const occ = detectOccasion(text);
   const budget = detectBudget(text);
   const intent = detectIntent(text);
   const season = detectSeason(text);
-
-  return [
+  const tags = [
     { k: "Occasion", v: occ?.label ?? "Not specified" },
     { k: "Budget", v: budget ?? "Flexible" },
     { k: "Formality", v: occ?.formality ?? "Smart Casual" },
@@ -112,18 +122,30 @@ function parseInput(text: string): Tag[] {
     { k: "Season", v: season },
     { k: "Event Type", v: occ?.eventType ?? "General" },
   ];
+
+  return {
+    raw: text,
+    tags,
+    occasion: tags[0].v,
+    budget: tags[1].v,
+    formality: tags[2].v,
+    styleIntent: tags[3].v,
+    season: tags[4].v,
+    eventType: tags[5].v,
+  };
 }
 
-export function OccasionChat() {
+export function OccasionChat({ onInterpreted }: { onInterpreted?: (context: OccasionContext) => void }) {
   const [value, setValue] = useState(examples[0]);
   const [submitted, setSubmitted] = useState(value);
   const [parsed, setParsed] = useState(true);
 
-  const tags = useMemo(() => parseInput(submitted), [submitted]);
+  const context = useMemo(() => parseInput(submitted), [submitted]);
 
   const interpret = () => {
     setSubmitted(value);
     setParsed(true);
+    onInterpreted?.(parseInput(value));
   };
 
   return (
@@ -143,7 +165,7 @@ export function OccasionChat() {
           {examples.map((e) => (
             <button
               key={e}
-              onClick={() => { setValue(e); setSubmitted(e); setParsed(true); }}
+              onClick={() => { setValue(e); setSubmitted(e); setParsed(true); onInterpreted?.(parseInput(e)); }}
               className="rounded-full glass px-3 py-1.5 text-[11px] text-muted-foreground hover:text-foreground"
             >
               {e.length > 28 ? e.slice(0, 28) + "…" : e}
@@ -167,7 +189,7 @@ export function OccasionChat() {
         >
           <div className="text-[11px] uppercase tracking-[0.2em] text-gold">AI extracted</div>
           <div className="mt-3 grid grid-cols-2 gap-2">
-            {tags.map((t) => (
+            {context.tags.map((t) => (
               <div key={t.k} className="rounded-xl glass-strong px-3 py-2">
                 <div className="text-[10px] uppercase tracking-wider text-muted-foreground">{t.k}</div>
                 <div className="text-sm">{t.v}</div>
