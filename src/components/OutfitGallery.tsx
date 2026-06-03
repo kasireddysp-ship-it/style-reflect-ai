@@ -3,8 +3,21 @@ import { useState } from "react";
 import elegant from "@/assets/outfit-elegant.jpg";
 import trendy from "@/assets/outfit-trendy.jpg";
 import budget from "@/assets/outfit-budget.jpg";
+import type { OccasionContext } from "@/components/OccasionChat";
+import type { PickedProfile } from "@/components/UploadCard";
 
-export const outfits = [
+export type Outfit = {
+  id: string;
+  label: string;
+  image: string;
+  price: string;
+  scores: { style: number; occasion: number; comfort: number; trend: number };
+  accent: string;
+  reason: string;
+  best: string;
+};
+
+export const outfits: Outfit[] = [
   {
     id: "elegant",
     label: "Elegant Look",
@@ -40,6 +53,56 @@ export const outfits = [
   },
 ];
 
+const mehendiLooks: Outfit[] = [
+  {
+    id: "mehendi-green",
+    label: "Mehandi Glow",
+    image: elegant,
+    price: "₹1,899",
+    scores: { style: 94, occasion: 99, comfort: 92, trend: 88 },
+    accent: "from-gold/30 to-transparent",
+    reason: "Under ₹2,000: a festive yellow-green kurta set with light dupatta styling, chosen for mehandi photos, daytime comfort, and warm skin undertones.",
+    best: "Best for mehandi under ₹2,000",
+  },
+  {
+    id: "mehendi-fusion",
+    label: "Festive Fusion",
+    image: trendy,
+    price: "₹1,749",
+    scores: { style: 91, occasion: 95, comfort: 90, trend: 96 },
+    accent: "from-primary/40 to-transparent",
+    reason: "A crop-top and palazzo inspired look that feels young, easy to dance in, and still reads traditional for a family function.",
+    best: "Best for photos + dancing",
+  },
+  {
+    id: "mehendi-budget",
+    label: "Budget Ethnic",
+    image: budget,
+    price: "₹1,299",
+    scores: { style: 86, occasion: 90, comfort: 96, trend: 82 },
+    accent: "from-muted to-transparent",
+    reason: "A reusable printed kurti look with oxidised earrings — safe, pretty, and comfortably below your stated budget.",
+    best: "Best value pick",
+  },
+];
+
+function personalizeOutfits(context?: OccasionContext | null, profile?: PickedProfile | null): Outfit[] {
+  const text = `${context?.raw ?? ""} ${context?.occasion ?? ""} ${context?.budget ?? ""}`.toLowerCase();
+  const source = /(mehandi|mehendi|mehndi)/.test(text) ? mehendiLooks : outfits;
+  const budgetText = context?.budget && context.budget !== "Flexible" ? context.budget : null;
+  const personaText = profile?.persona === "custom" ? "your uploaded photo" : profile?.name ?? "your style profile";
+
+  return source.map((look, i) => ({
+    ...look,
+    label: context?.occasion && context.occasion !== "Not specified" ? `${context.occasion} ${i === 0 ? "Best" : i === 1 ? "Trend" : "Value"}` : look.label,
+    reason: `${look.reason} Matched to ${personaText}${budgetText ? ` and your ${budgetText} budget` : ""}.`,
+    scores: {
+      ...look.scores,
+      occasion: context?.occasion && context.occasion !== "Not specified" ? Math.min(99, look.scores.occasion + 3) : look.scores.occasion,
+    },
+  }));
+}
+
 function Score({ label, value }: { label: string; value: number }) {
   return (
     <div>
@@ -53,9 +116,10 @@ function Score({ label, value }: { label: string; value: number }) {
   );
 }
 
-export function OutfitGallery() {
+export function OutfitGallery({ context, profile, onTryOn }: { context?: OccasionContext | null; profile?: PickedProfile | null; onTryOn?: (outfit: Outfit) => void }) {
   const [saved, setSaved] = useState<Set<string>>(new Set());
   const [compared, setCompared] = useState<Set<string>>(new Set());
+  const suggested = personalizeOutfits(context, profile);
 
   const toggleSave = (id: string) =>
     setSaved((prev) => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
@@ -68,7 +132,7 @@ export function OutfitGallery() {
 
   return (
     <div className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-4 no-scrollbar">
-      {outfits.map((o, i) => (
+      {suggested.map((o, i) => (
         <motion.article
           key={o.id}
           initial={{ opacity: 0, y: 20 }}
@@ -92,10 +156,10 @@ export function OutfitGallery() {
                 <div className="font-display text-lg">{o.price}</div>
               </div>
               <button
-                onClick={scrollToTryOn}
+                onClick={() => { onTryOn?.(o); scrollToTryOn(); }}
                 className="rounded-full bg-gradient-primary px-4 py-2 text-xs font-medium text-primary-foreground shadow-glow transition active:scale-95"
               >
-                Try On
+                Try On Me
               </button>
             </div>
           </div>
