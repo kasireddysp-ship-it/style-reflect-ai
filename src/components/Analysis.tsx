@@ -65,6 +65,28 @@ const DEFAULT_TRAITS: TraitSet = {
   ],
 };
 
+const TRAIT_POOL: Record<string, string[]> = {
+  "Body Type": ["Hourglass", "Athletic", "Slim", "Pear", "Rectangle", "Broad Shoulder", "Inverted Triangle"],
+  "Skin Tone": ["Warm Honey", "Neutral Beige", "Cool Fair", "Warm Olive", "Deep Mocha", "Golden Wheat", "Porcelain"],
+  "Style DNA": ["Elegant Ethnic", "Streetwear Chic", "Smart Modern", "Power Luxe", "Boho Romantic", "Minimal Classic", "Edgy Avant-Garde"],
+  "Preferred Fit": ["Relaxed Tailored", "Oversized Relaxed", "Tailored Slim", "Structured Sharp", "Flowy Drape", "Bodycon Fitted"],
+  "Fashion Personality": ["Confident Minimalist", "Festive Maximalist", "Trendsetter Gen-Z", "Boardroom Icon", "Romantic Dreamer", "Bold Rebel", "Effortless Cool"],
+};
+
+function hashString(s: string) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function generateTraits(seed: string) {
+  return Object.keys(TRAIT_POOL).map((label, i) => {
+    const arr = TRAIT_POOL[label];
+    const h = hashString(seed + ":" + label + ":" + i);
+    return { label, value: arr[h % arr.length] };
+  });
+}
+
 const stages = [
   "Detecting silhouette…",
   "Reading skin undertone…",
