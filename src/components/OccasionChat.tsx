@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
 const examples = [
-  "I have a haldi ceremony next month under ₹5000",
+  "I have a mehandi function next month dress under 2000",
   "I want a classy date-night look",
   "I need outfits for a Goa vacation",
   "I want a rich CEO vibe",
