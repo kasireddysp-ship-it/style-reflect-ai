@@ -5,7 +5,7 @@ import { Splash } from "@/components/Splash";
 import { UploadCard, type PickedProfile } from "@/components/UploadCard";
 import { Analysis } from "@/components/Analysis";
 import { OccasionChat, parseInput, type OccasionContext } from "@/components/OccasionChat";
-import { OutfitGallery, outfits, personalizeOutfits, type Outfit } from "@/components/OutfitGallery";
+import { OutfitGallery, personalizeOutfits, type Outfit } from "@/components/OutfitGallery";
 import { TryOnSlider } from "@/components/TryOnSlider";
 import accessories from "@/assets/accessories.jpg";
 import elegant from "@/assets/outfit-elegant.jpg";
