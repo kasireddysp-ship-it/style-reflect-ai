@@ -5,7 +5,7 @@ import { Splash } from "@/components/Splash";
 import { UploadCard, type PickedProfile } from "@/components/UploadCard";
 import { Analysis } from "@/components/Analysis";
 import { OccasionChat, parseInput, type OccasionContext } from "@/components/OccasionChat";
-import { OutfitGallery, outfits, type Outfit } from "@/components/OutfitGallery";
+import { OutfitGallery, personalizeOutfits, type Outfit } from "@/components/OutfitGallery";
 import { TryOnSlider } from "@/components/TryOnSlider";
 import accessories from "@/assets/accessories.jpg";
 import elegant from "@/assets/outfit-elegant.jpg";
@@ -234,6 +234,8 @@ function Index() {
   const [demo, setDemo] = useState<PickedProfile | null>(null);
   const [occasion, setOccasion] = useState<OccasionContext>(() => parseInput("I have a mehandi function next month dress under 2000"));
   const [tryOnOutfit, setTryOnOutfit] = useState<Outfit | null>(null);
+  const suggestedOutfits = personalizeOutfits(occasion, demo);
+  const comparisonOutfits = (tryOnOutfit ? [tryOnOutfit, ...suggestedOutfits.filter((o) => o.id !== tryOnOutfit.id)] : suggestedOutfits).slice(0, 4);
 
   return (
     <Phone>
@@ -306,14 +308,14 @@ function Index() {
       </Section>
 
       {/* 6. OUTFIT GENERATION */}
-      <Section id="outfits" eyebrow="Step 04" title="Three looks. One you." subtitle="Curated for your body, budget and moment.">
+      <Section id="outfits" eyebrow="Step 04" title="Choose from 12 dresses." subtitle="Pick a mehandi dress first, then see it on your uploaded photo.">
         <OutfitGallery context={occasion} profile={demo} onTryOn={setTryOnOutfit} />
       </Section>
 
       {/* 7. WHY THIS SUITS YOU */}
       <Section eyebrow="Explainable AI" title="Why this suits you.">
         <div className="space-y-3">
-          {outfits.map((o) => (
+          {suggestedOutfits.slice(0, 5).map((o) => (
             <motion.div
               key={o.id}
               initial={{ opacity: 0, x: -16 }}
@@ -332,7 +334,7 @@ function Index() {
       </Section>
 
       {/* 8. VIRTUAL TRY-ON */}
-      <Section id="tryon" eyebrow="Virtual Try-On" title="Slide. Reveal. Believe." subtitle="Premium photoreal visualization on your own silhouette.">
+      <Section id="tryon" eyebrow="Virtual Try-On" title={tryOnOutfit ? `${tryOnOutfit.label} on you.` : "Select a dress to try on."} subtitle="Every dress choice changes the outfit overlay on your own photo.">
         <TryOnSlider profile={demo} outfit={tryOnOutfit} />
       </Section>
 
@@ -353,22 +355,20 @@ function Index() {
             <thead className="text-[10px] uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="pb-3"></th>
-                <th className="pb-3">Elegant</th>
-                <th className="pb-3">Trendy</th>
-                <th className="pb-3">Budget</th>
+                {comparisonOutfits.map((o) => <th key={o.id} className="pb-3">{o.label.split(" ")[0]}</th>)}
               </tr>
             </thead>
             <tbody className="[&>tr>td]:py-3 [&>tr]:border-t [&>tr]:border-white/5">
-              <tr><td className="text-muted-foreground">Style</td><td>96</td><td>92</td><td>84</td></tr>
-              <tr><td className="text-muted-foreground">Budget</td><td>₹4.9k</td><td>₹3.4k</td><td>₹2.2k</td></tr>
-              <tr><td className="text-muted-foreground">Occasion</td><td>98</td><td>86</td><td>80</td></tr>
-              <tr><td className="text-muted-foreground">Comfort</td><td>88</td><td>82</td><td>94</td></tr>
-              <tr><td className="text-muted-foreground">Trend</td><td>84</td><td>98</td><td>76</td></tr>
+              <tr><td className="text-muted-foreground">Style</td>{comparisonOutfits.map((o) => <td key={o.id}>{o.scores.style}</td>)}</tr>
+              <tr><td className="text-muted-foreground">Budget</td>{comparisonOutfits.map((o) => <td key={o.id}>{o.price}</td>)}</tr>
+              <tr><td className="text-muted-foreground">Occasion</td>{comparisonOutfits.map((o) => <td key={o.id}>{o.scores.occasion}</td>)}</tr>
+              <tr><td className="text-muted-foreground">Comfort</td>{comparisonOutfits.map((o) => <td key={o.id}>{o.scores.comfort}</td>)}</tr>
+              <tr><td className="text-muted-foreground">Trend</td>{comparisonOutfits.map((o) => <td key={o.id}>{o.scores.trend}</td>)}</tr>
             </tbody>
           </table>
         </div>
         <div className="mt-4 grid grid-cols-3 gap-2 text-[10px]">
-          {outfits.map((o) => (
+          {suggestedOutfits.slice(0, 6).map((o) => (
             <div key={o.id} className="rounded-2xl glass p-3">
               <div className="font-display text-sm">{o.label.split(" ")[0]}</div>
               <div className="mt-1 text-muted-foreground">{o.best}</div>
