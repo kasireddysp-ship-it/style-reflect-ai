@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import elegant from "@/assets/outfit-elegant.jpg";
 import portrait from "@/assets/hero-portrait.jpg";
-import type { Outfit } from "@/components/OutfitGallery";
+import { DressArt, type Outfit } from "@/components/OutfitGallery";
 import type { PickedProfile } from "@/components/UploadCard";
 
 export function TryOnSlider({ profile, outfit }: { profile?: PickedProfile | null; outfit?: Outfit | null }) {
@@ -49,12 +49,19 @@ export function TryOnSlider({ profile, outfit }: { profile?: PickedProfile | nul
       >
         {/* Right side: your original photo */}
         <img src={beforePhoto} alt="Your photo" className="absolute inset-0 h-full w-full object-cover" />
-        {/* Left side: simulated try-on — your photo with outfit tinted on top */}
+        {/* Left side: selected dress drawn over your uploaded photo */}
         <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: `${pos}%` }}>
-          <img src={beforePhoto} alt="You wearing the outfit" className="absolute inset-0 h-full w-full object-cover" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
-          <img src={afterPhoto} alt="" className="absolute inset-0 h-full w-full object-cover opacity-55 mix-blend-soft-light" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }} />
+          <div className="absolute inset-0" style={{ width: `${10000 / Math.max(pos, 1)}%`, maxWidth: "none" }}>
+            {outfit ? (
+              <DressArt outfit={outfit} photo={beforePhoto} compact />
+            ) : (
+              <img src={afterPhoto} alt="Suggested outfit" className="h-full w-full object-cover" />
+            )}
+          </div>
           <div className="absolute bottom-16 left-3 right-3 flex items-center gap-2 rounded-2xl glass-strong p-2">
-            <img src={afterPhoto} alt={outfitName} className="h-12 w-10 rounded-lg object-cover" />
+            <div className="h-12 w-10 overflow-hidden rounded-lg">
+              {outfit ? <DressArt outfit={outfit} compact /> : <img src={afterPhoto} alt={outfitName} className="h-full w-full object-cover" />}
+            </div>
             <div className="text-[11px] leading-tight">
               <div className="text-gold">Now wearing</div>
               <div className="font-medium">{outfitName}</div>
