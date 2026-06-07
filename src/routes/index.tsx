@@ -335,8 +335,11 @@ function Index() {
       </Section>
 
       {/* 8. VIRTUAL TRY-ON */}
-      <Section id="tryon" eyebrow="Virtual Try-On" title={tryOnOutfit ? `${tryOnOutfit.label} on you.` : "Select a dress to try on."} subtitle="Every dress choice changes the outfit overlay on your own photo.">
-        <TryOnSlider profile={demo} outfit={tryOnOutfit} />
+      <Section id="tryon" eyebrow="Virtual Try-On" title={tryOnOutfit ? `${tryOnOutfit.label} on you.` : "Select a dress to try on."} subtitle="Pick from our curated set or paste a Myntra link to try a real dress on your photo.">
+        <div className="space-y-4">
+          <MyntraPicker onPick={setTryOnOutfit} />
+          <TryOnSlider profile={demo} outfit={tryOnOutfit} />
+        </div>
       </Section>
 
       {/* 9. SHARE & VOTES */}
