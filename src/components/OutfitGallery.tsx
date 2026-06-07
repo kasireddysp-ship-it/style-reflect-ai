@@ -21,6 +21,10 @@ export type Outfit = {
   colors: { primary: string; secondary: string; trim: string };
   pattern: DressPattern;
   silhouette: DressSilhouette;
+  /** Optional real garment image (e.g. Myntra product) used as a reference for AI try-on. */
+  referenceImageUrl?: string;
+  /** Optional link back to the product page. */
+  productUrl?: string;
 };
 
 export const outfits: Outfit[] = [

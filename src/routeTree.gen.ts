@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiTryonRouteImport } from './routes/api/tryon'
+import { Route as ApiMyntraProductRouteImport } from './routes/api/myntra-product'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +23,39 @@ const ApiTryonRoute = ApiTryonRouteImport.update({
   path: '/api/tryon',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiMyntraProductRoute = ApiMyntraProductRouteImport.update({
+  id: '/api/myntra-product',
+  path: '/api/myntra-product',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/api/myntra-product': typeof ApiMyntraProductRoute
   '/api/tryon': typeof ApiTryonRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/api/myntra-product': typeof ApiMyntraProductRoute
   '/api/tryon': typeof ApiTryonRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/api/myntra-product': typeof ApiMyntraProductRoute
   '/api/tryon': typeof ApiTryonRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/api/tryon'
+  fullPaths: '/' | '/api/myntra-product' | '/api/tryon'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/api/tryon'
-  id: '__root__' | '/' | '/api/tryon'
+  to: '/' | '/api/myntra-product' | '/api/tryon'
+  id: '__root__' | '/' | '/api/myntra-product' | '/api/tryon'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ApiMyntraProductRoute: typeof ApiMyntraProductRoute
   ApiTryonRoute: typeof ApiTryonRoute
 }
 
@@ -65,11 +75,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiTryonRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/myntra-product': {
+      id: '/api/myntra-product'
+      path: '/api/myntra-product'
+      fullPath: '/api/myntra-product'
+      preLoaderRoute: typeof ApiMyntraProductRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ApiMyntraProductRoute: ApiMyntraProductRoute,
   ApiTryonRoute: ApiTryonRoute,
 }
 export const routeTree = rootRouteImport

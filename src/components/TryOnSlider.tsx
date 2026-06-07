@@ -45,7 +45,7 @@ export function TryOnSlider({ profile, outfit }: { profile?: PickedProfile | nul
       const res = await fetch("/api/tryon", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ image, prompt }),
+        body: JSON.stringify({ image, prompt, referenceImageUrl: outfit.referenceImageUrl }),
       });
       const data = await res.json();
       if (!res.ok || !data.image) throw new Error(data.error || "Generation failed");
