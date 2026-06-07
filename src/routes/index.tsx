@@ -7,6 +7,7 @@ import { Analysis } from "@/components/Analysis";
 import { OccasionChat, parseInput, type OccasionContext } from "@/components/OccasionChat";
 import { OutfitGallery, personalizeOutfits, type Outfit } from "@/components/OutfitGallery";
 import { TryOnSlider } from "@/components/TryOnSlider";
+import { MyntraPicker } from "@/components/MyntraPicker";
 import accessories from "@/assets/accessories.jpg";
 import elegant from "@/assets/outfit-elegant.jpg";
 import trendy from "@/assets/outfit-trendy.jpg";
